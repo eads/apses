@@ -28,5 +28,11 @@
 		"vite": "^5.0.3",
 		"vitest": "^2.0.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@unovis/svelte": "^1.4.3",
+		"@unovis/ts": "^1.4.3",
+		"arquero": "^6.0.0",
+		"svelte-select": "^5.8.3"
+	}
 }
