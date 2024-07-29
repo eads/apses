@@ -7,33 +7,11 @@ export const load = ({ fetch }) => {
                 fetch('https://s3.amazonaws.com/tmp-gfx-public-data/census_labor_data20230810/state_employment.json')
                     .then(response => response.json())
                     .then(rows => {
-                        // let grouped = rows.reduce((curr, val) => {
-                        //     let group = curr.find(g => g.state === `${val.state}`);
-                        //     if (group) {
-                        //         group.values.push(val);
-                        //     } else {
-                        //         curr.push({ state: `${val.state}`, values: [ val ] }); 
-                        //     }
-                        //     return curr;
-                        // }, []);
-
-                        // // let names = grouped.map(g => g.state);
-                        
-                        // // let gov_functions = rows.reduce((curr, val) => {
-                        // //     let group = curr.find(g => g.name === `${val.gov_function}`);
-                        // //     if (!group) {
-                        // //         curr.push({name:val.gov_function});
-                        // //     } 
-                        // //     return curr;
-                        // // }, []);
-
                         const dt = from(rows);
-                        const names = dt.groupby('state').rollup().objects();
-                        const gov_functions = dt.groupby('gov_function').rollup().objects();
-
-                        console
-
-                        return { rows, grouped, names, gov_functions };
+                        const state_names = dt.groupby('state').rollup().objects().map(d => d.state);
+                        const gov_functions = dt.groupby('gov_function').rollup().objects().map(d => d.gov_function);
+                        const chart_data = dt.groupby("state", "year").pivot('gov_function', { value: d => op.sum(d.ft_employment) }).orderby('state', 'year').objects();
+                        return { rows, state_names, gov_functions, chart_data };
                     })
         }
     };
