@@ -3,7 +3,7 @@
 
     export let data;
     let stateValue = '';
-    let measureValue = 'ft_employment';
+    let measureValue = 'ft_pay_per_employee';
     let disabled = true;
     let selectedData = [];
 
