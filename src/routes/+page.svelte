@@ -35,9 +35,9 @@
             {#await data.app.stateData}
                 <option value="">Loading...</option>
             {:then stateData}
+                <option value="ft_pay_per_employee">Full time pay per full time employee</option>
                 <option value="ft_employment">Full time employment</option>
                 <option value="ft_pay">Full time pay</option>
-                <option value="ft_pay_per_employee">Full time pay per full time employee</option>
             {/await}
         </select>
     </div>
