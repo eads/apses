@@ -1,4 +1,4 @@
-import { from, all, desc, op, table } from 'arquero';
+import { from } from 'arquero';
 
 export const load = ({ fetch }) => {
     return {  
@@ -10,8 +10,7 @@ export const load = ({ fetch }) => {
                         const dt = from(rows);
                         const state_names = dt.groupby('state').rollup().objects().map(d => d.state);
                         const gov_functions = dt.groupby('gov_function').rollup().objects().map(d => d.gov_function);
-                        const chart_data = dt.groupby("state", "year").pivot('gov_function', { value: d => op.sum(d.ft_employment) }).orderby('state', 'year').objects();
-                        return { rows, state_names, gov_functions, chart_data };
+                        return { rows, state_names, gov_functions };
                     })
         }
     };

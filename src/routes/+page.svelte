@@ -1,69 +1,57 @@
 <script>
-    import { Scale, Position } from '@unovis/ts'
-    import { VisXYContainer, VisLine, VisAxis, VisBulletLegend, VisCrosshair, VisTooltip, VisStackedBar } from '@unovis/svelte'
+    import { LineChart } from "@onsvisual/svelte-charts";
 
     export let data;
-    let value = 'alabama';
+    let stateValue = 'maryland'; // iowa good too
+    let measureValue = 'ft_employment';
+    let selectedData = [];
 
-    const statestate_names = data.app.stateData.then((groups) => {
-        console.log(groups);
+    $: data.app.stateData.then((stateData) => {
+        const out = stateData.rows.filter(d => d.state === stateValue && !d.gov_function.includes('total'));
+        console.log(out);
+        selectedData = out || [];
     })
+  
+    // let hover = true;
+    // let hovered = null;
 
-    const x = d => d.year; 
-    // const y = async (d) => {
-        // const foo = await data.app.stateData;
-        // console.log(foo);
-        // foo.
-    //  };
-    const y = [
-        d => d['air transportation'],
-        d => d['corrections'],
-        d => d['elementary and secondary education'],
-        d => Math.random() * 100,
-        // d => d['higher education'],
-        // d => d['hospitals'],
-        // d => d['human services'],
-        // d => d['judicial and legal'],
-        // d => d['natural resources'],
-    ]
-
-    function tooltipTemplate(d){
-        return `
-            <div>
-                <div>${d.gov_function}</div>
-                <div>${d.year}</div>
-                <div>${d.ft_employment}</div>
-            </div>
-        `
-    }
-    
 </script>
 
 {#await data.app.stateData}
 <p>waiting...</p>
 {:then stateData}
 
-<select bind:value={value}>
+<select bind:value={stateValue}>
     {#each stateData.state_names as name}
-        <option value={name}>{name}</option>
+    <option value={name}>{name}</option>
     {/each}
 </select>
 
-<h1>{value}</h1>
+<select bind:value={measureValue}>
+    <option value="ft_employment">Full time employment</option>
+    <option value="ft_pay">Full time pay</option>
+</select>
 
-<VisXYContainer data={stateData.rows.filter(d => d.state === value)} height={500} xScale={Scale.scaleLinear()}>
-    <VisLine {x} {y} /> 
+<h1>{stateValue}</h1>
 
-    <!-- <VisLine {x} y={
-        stateData.gov_functions.map((gov_function) => {
-            return d => Math.random() * 100 ///d[gov_function]
-        })
-    } /> -->
-  <VisAxis type="x" label="Date" numTicks={6} tickFormat={(value) => value}/>
-  <VisAxis type="y" label="FT employment"/>
-  <VisCrosshair template={tooltipTemplate}/>
-  <VisTooltip verticalShift={400} horizontalPlacement={Position.Center}/>
-</VisXYContainer>
+<p>chart</p>
+
+<LineChart
+    height={600}
+    data={selectedData}
+    xKey="year"
+    yKey={measureValue}
+    zKey="gov_function"
+    labels="hover"
+    color="gray"
+    selected={['education - higher education other']}
+    hover={true}
+    snapTicks={false}
+    animation={false}
+    padding={{ top: 0, bottom: 28, left: 35, right: 200 }}
+/>
+
+{:catch error}
 
 {/await}
 
