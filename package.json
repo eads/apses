@@ -39,8 +39,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@onsvisual/svelte-charts": "^0.3.15",
     "arquero": "^6.0.0",
+    "layercake": "^8.3.4",
     "svelte-select": "^5.8.3",
     "svelte-tiny-virtual-list": "^2.1.2"
   }
