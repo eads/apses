@@ -1,20 +1,32 @@
 <script>
+    import { onMount } from 'svelte';
+    import VirtualList from 'svelte-tiny-virtual-list';
     import { LineChart } from "@onsvisual/svelte-charts";
 
     export let data;
     let stateValue = '';
-    let measureValue = 'ft_pay_per_employee';
+    // let measureValue = 'ft_pay_per_employee';
+    let measureValue = 'ft_employment';
     let disabled = true;
+    let fullData = [];
     let selectedData = [];
+    let govFunctions = [];
 
-    $: data.app.stateData.then((stateData) => {
-        if (disabled) {
-            let randomState = Math.floor(Math.random() * stateData.state_names.length);
-            stateValue = stateData.state_names[randomState];
-            disabled = false;
-        }
-        selectedData = stateData.rows.filter(d => d.state === stateValue && !d.gov_function.includes('total'));
-    })
+    onMount(() => {
+        data.app.stateData.then((stateData) => {
+            if (disabled) {
+                let randomState = Math.floor(Math.random() * stateData.state_names.length);
+                stateValue = stateData.state_names[randomState];
+                disabled = false;
+            }
+            fullData = stateData;
+        })
+    });
+
+    $: {
+        selectedData = fullData.rows ? fullData.rows.filter(d => d.state === stateValue && !d.gov_function.includes('total')) : [];
+        govFunctions = selectedData.length ? [...new Set(selectedData.map(d => d.gov_function))] : [];
+    }
 </script>
 
 <div class="p-2 bg-gray-700">
@@ -22,7 +34,7 @@
     
     <p class="text-white mb-5">From the <a class="underline" href="https://observablehq.com/@themarshallproject/census-labor-data-release">Annual Survey of Public Employment & Payroll</a>, 2000-2022.</p>
     <div>
-        <select id="state-selector" {disabled} bind:value={stateValue} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <select id="state-selector" bind:value={stateValue} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             {#await data.app.stateData}
                 <option value="">Loading...</option>
             {:then stateData}
@@ -48,7 +60,28 @@
         <p>Loading...</p>
     </div>
 {:then stateData}
-    <div class="p-4">
+
+<div class="p-4">
+    <VirtualList width="100%" height={800} itemCount={govFunctions.length} itemSize={200}>
+        <div slot="item" class="flex" let:index let:style {style}>
+            <div class="flex-none w-48 mr-10">{govFunctions[index]}</div>
+            <div class="flex-initial w-64">
+                <LineChart
+                    height={50}
+                    data={selectedData.filter(d => d.gov_function === govFunctions[index])}
+                    xKey="year"
+                    yKey={measureValue}
+                    snapTicks={false}
+                    yTicks={2}
+                    xTicks={3}
+                    padding={{ top: 10, bottom: 0, left: 0, right: 10 }}
+                />
+            </div>
+        </div>
+    </VirtualList>
+</div>
+
+    <!-- <div class="p-4">
         <h1 class="text-4xl mt-10 uppercase">{stateValue}</h1>
         <LineChart
             height={600}
@@ -63,7 +96,7 @@
             animation={false}
             padding={{ top: 0, bottom: 28, left: 10, right: 100 }}
         />
-    </div>
+    </div> -->
 {/await}
 
 <div class="p-4 text-lg mx-auto max-w-2xl [&>p>a]:underline">
