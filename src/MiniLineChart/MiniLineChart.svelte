@@ -27,7 +27,7 @@
 
 <div class="chart-container" style="height: {height}px;">
   <LayerCake
-    padding={{ top: 20, right: 30, bottom: 10, left: 30 }}
+    padding={{ top: 20, right: 50, bottom: 10, left: 10 }}
     x={xKey}
     y={yKey}
     {xDomain}

@@ -17,8 +17,10 @@
 		.join('L');
   
   const formatNumber = (num) => {
-    if (Math.round(num / 1000) > 1) {
-      return Math.round(num / 1000).toFixed(0) + 'k';
+    if (Math.round(num / 1000000) >= 1) {
+      return (Math.round(num / 100000) / 10).toFixed(1) + 'm';
+    } else if (Math.round(num / 1000) >= 1) {
+      return (Math.round(num / 100) / 10).toFixed(1) + 'k';
     } else {
       return num.toFixed(0);
     }
@@ -34,7 +36,7 @@
 		fill: none;
 		stroke-linejoin: round;
 		stroke-linecap: round;
-		stroke-width: 2;
+		stroke-width: 3;
 	}
 </style>
 
