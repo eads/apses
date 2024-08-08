@@ -2,7 +2,6 @@
   import { LayerCake, Svg } from 'layercake';
 
   import Line from './Line.svelte';
-  import AxisX from './AxisX.svelte';
 
   export let data = undefined;
   export let xKey = 'myX';
