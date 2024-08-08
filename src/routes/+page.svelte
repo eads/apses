@@ -13,13 +13,18 @@
     let maxFtPay = 0;
     let maxFtEmployment = 0;
     let maxFtPayPerEmployee = 0;
-    let sharedScale = true;
+    let sharedScale = false;
     let mobileMax = 0;
     let mobileChartField = 'ft_employment';
 
-    const itemSize = 140;
+    const itemSize = 120;
     const itemCount = 5;
     const xDomain = [2004, 2022];
+    const strokes = {
+        ft_employment: 'steelblue',
+        ft_pay_per_employee: 'seagreen',
+        ft_pay: 'mediumvioletred',
+    }
 
     onMount(() => {
         data.app.stateData.then((stateData) => {
@@ -139,7 +144,7 @@
                         yDomain = {[0, sharedScale ? mobileMax : null]}
                         xKey="year"
                         yKey={mobileChartField}
-                        stroke="steelblue"
+                        stroke={strokes[mobileChartField]}
                     />
                 </div>
             </div>
