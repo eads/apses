@@ -2,7 +2,7 @@
   import { LayerCake, Svg } from 'layercake';
 
   import Line from './Line.svelte';
-  // import AxisX from './AxisX.svelte';
+  import AxisX from './AxisX.svelte';
 
   export let data = undefined;
   export let xKey = 'myX';
@@ -27,7 +27,7 @@
 
 <div class="chart-container" style="height: {height}px;">
   <LayerCake
-    padding={{ top: 20, right: 50, bottom: 10, left: 10 }}
+    padding={{ top: 20, right: 50, bottom: 30, left: 10 }}
     x={xKey}
     y={yKey}
     {xDomain}

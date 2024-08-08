@@ -2,7 +2,12 @@ import { from } from 'arquero';
 
 export const load = ({ fetch }) => {
     return {  
-        app: { 
+        app: {
+            // annotations: {
+            //     'washington': {
+
+            //     }    
+            // }
             stateData: 
                 fetch('https://s3.amazonaws.com/tmp-gfx-public-data/census_labor_data20230810/state_employment.json')
                     .then(response => response.json())

@@ -17,8 +17,8 @@
     let mobileMax = 0;
     let mobileChartField = 'ft_employment';
 
-    const itemSize = 100;
-    const itemCount = 6;
+    const itemSize = 140;
+    const itemCount = 5;
     const xDomain = [2004, 2022];
 
     onMount(() => {
@@ -54,20 +54,23 @@
                     {/each}
                 {/await}
             </select> 
-            <h1 class="ml-2 flex-1">Employment Explorer</h1>
+            <h1 class="ml-2">Employment Explorer</h1>
+            <label class="pl-5 text-sm md:text-base flex-1 hidden md:block">
+                <input name="scale-selector" type="checkbox" bind:checked={sharedScale} /> Shared scale?
+            </label>
             <div class="text-lg text-zinc-500 justify-self-end">
                 <a href="#about">ⓘ</a>
             </div>
         </div> 
     </div>
-    <div class="flex items-center bg-zinc-200 px-4 py-2 md:text-md">
+    <div class="flex items-center bg-zinc-200 px-4 py-2 md:hidden md:text-md">
         <select id="mobileChart-selector" bind:value={mobileChartField} class="w-1/2 md:hidden bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-md py-1">
             <option value="ft_employment">Full time employees</option>
             <option value="ft_pay_per_employee">Monthly pay per full time employee</option>
             <option value="ft_pay">Monthly full time pay (total)</option>
         </select>
         
-        <label class="pl-5 text-sm md:text-base">
+        <label class="pl-5 text-sm md:text-base md:hidden">
             <input name="scale-selector" type="checkbox" bind:checked={sharedScale} /> Shared scale?
         </label>
     </div>
@@ -89,12 +92,12 @@
             <div class="flex-initial md:hidden py-2.5">{mobileChartField}</div>
         </div>
         <VirtualList width="100%" height={itemSize * itemCount} itemCount={govFunctions.length} {itemSize}>
-            <div slot="item" class="flex items-center border-b border-zinc-500" let:index let:style {style}>
+            <div slot="item" class="flex items-center border-b-2 border-white bg-zinc-200" let:index let:style {style}>
                 <div class="flex-none w-1/3 md:w-48 uppercase text-xs md:text-sm px-2">
                     {govFunctions[index]}
                 </div>
                 <div class="flex-1 hidden md:flex">
-                    <div class="flex-initial pl-5 w-80">
+                    <div class="flex-initial w-64">
                         <MiniLineChart
                             height={itemSize}
                             data={selectedData.filter(d => d.gov_function === govFunctions[index])}
@@ -105,7 +108,7 @@
                             stroke="steelblue"
                         />
                     </div>
-                    <div class="flex-initial pl-5 w-80">
+                    <div class="flex-initial w-64">
                         <MiniLineChart
                             height={itemSize}
                             data={selectedData.filter(d => d.gov_function === govFunctions[index])}
@@ -116,7 +119,7 @@
                             stroke="seagreen"
                         />
                     </div>
-                    <div class="flex-initial pl-5 w-80">
+                    <div class="flex-initial w-64">
                         <MiniLineChart
                             height={itemSize}
                             data={selectedData.filter(d => d.gov_function === govFunctions[index])}
