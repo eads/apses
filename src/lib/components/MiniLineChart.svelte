@@ -1,7 +1,7 @@
 <script>
   import { LayerCake, Svg } from 'layercake';
 
-  import Line from './Line.svelte';
+  import Line from '$lib/components/Line.svelte';
 
   export let data = undefined;
   export let xKey = 'myX';
