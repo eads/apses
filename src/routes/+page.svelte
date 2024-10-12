@@ -12,6 +12,8 @@
     let selectedData = [];
     let stateData = null;
 
+
+
     // $: data.app.stateData.then((stateDataResp) => {
     //     stateData = stateDataResp;
     //     if (disabled) {
@@ -26,18 +28,18 @@
 
 <div use:scrollRef={'app'} class="flex flex-col h-dvh">
     <header class="bg-gray-800 text-white">
-        <StateSelector {stateValue} {stateData} {disabled} />
-        <MeasureSelector {measureValue} />
+        <StateSelector {data} />
+        <!-- <MeasureSelector {measureValue} /> -->
         <h1>Header w/ link to <a class="underline" use:scrollTo={'about'}>about section</a></h1>
     </header>
     <section class="flex-grow overflow-y-scroll bg-zinc-200">
-        {#await data.app.stateData}
-            <div class="p-8">
-                <p>Loading...</p>
-            </div>
-        {:then stateData}
-            <ChartContainer {selectedData} {stateValue} {measureValue} />
-        {/await}
+        <!-- {#await data.app.stateData} -->
+            <!-- <div class="p-8"> -->
+                <!-- <p>Loading...</p> -->
+            <!-- </div> -->
+        <!-- {:then stateData} -->
+            <!-- <ChartContainer {selectedData} {stateValue} {measureValue} /> -->
+        <!-- {/await} -->
     </section>
     <footer class="bg-green-900 text-white">
         <h1>Footer</h1>
