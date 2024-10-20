@@ -10,3 +10,6 @@
 </script>
 
 <p>hi</p>
+
+<p slot="state_notes">Custom notes for {state_slug}</p>
+

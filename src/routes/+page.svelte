@@ -2,28 +2,10 @@
     import { scrollTo, scrollRef} from 'svelte-scrolling';
 
     import StateSelector from '$lib/components/StateSelector.svelte';
-    import MeasureSelector from '$lib/components/MeasureSelector.svelte';
-    import ChartContainer from '$lib/components/ChartContainer.svelte';
+    // import MeasureSelector from '$lib/components/MeasureSelector.svelte';
+    // import ChartContainer from '$lib/components/ChartContainer.svelte';
 
     export let data;
-    let stateValue = '';
-    let measureValue = 'ft_pay_per_employee';
-    let disabled = true;
-    let selectedData = [];
-    let stateData = null;
-
-
-
-    // $: data.app.stateData.then((stateDataResp) => {
-    //     stateData = stateDataResp;
-    //     if (disabled) {
-    //         let randomState = Math.floor(Math.random() * stateData.state_names.length);
-    //         stateValue = stateData.state_names[randomState];
-    //         disabled = false;
-    //     }
-    //     selectedData = stateData.rows.filter(d => d.state === stateValue && !d.gov_function.includes('total'));
-    // });
-
 </script>
 
 <div use:scrollRef={'app'} class="flex flex-col h-dvh">
