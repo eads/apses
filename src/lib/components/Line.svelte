@@ -48,7 +48,6 @@
 
 <path class='path-line' d='{path}' {stroke}></path>
 <text x={$xGet($data[$data.length - 1])} y={$yGet($data[$data.length -1])} dx="4" dy="4" font-size="14" fill={stroke}>{formatNumber($y($data[$data.length - 1]))}</text>
-<text x={$xGet($data[$data.length - 1])} y={$yGet($data[$data.length -1])} dx="4" dy="18" font-size="10" fill={stroke}>{formatPct(($y($data[$data.length - 1]) - $y($data[0])) / $y($data[0]))}</text>
 <text x={$xGet($data[$data.length - 1])} y={$height} text-anchor="middle" dy="20" font-size="10" fill={textcolor}>{$x($data[$data.length - 1])}</text>
 <line
 	class="grid-line"
