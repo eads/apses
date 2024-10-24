@@ -70,27 +70,51 @@
 
 </script>
 
-<p class="mb-8 italic">This will be a note about the state if there is a note.</p>
+<div class="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+  <p class="mb-8 italic text-gray-700">
+    This will be a note about the state if there is a note.
+  </p>
 
-<!-- Loop over the grouped object keys -->
-{#each Object.keys(groupedByGovFunction) as gov_function}
-<!-- Repeat for each category -->
-<div class="category-row">
-  <h2 class="uppercase">{gov_function}</h2>
-  <div 
-    class="grid grid-cols-1 md:grid-cols-3 gap-4"
-    in:fly={{ x: 100 }} out:fly={{ x: -100 }}
-    use:swipe
-    onSwipe={handleSwipe}
-  >
-    {#each categories as category}
-      <MiniLineChart
-        data={groupedByGovFunction[gov_function]}
-        xKey="year"
-        yKey={category}
-        height={100}
-      />
-    {/each}
-  </div>
+  {#each Object.keys(groupedByGovFunction) as gov_function}
+    <div class="category-row mb-12">
+      <h2 class="text-xl font-medium uppercase mb-4 text-gray-800">
+        {gov_function}
+      </h2>
+
+      <!-- Container for Charts -->
+      <div
+        class="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar"
+        use:swipe={handleSwipe}
+      >
+        {#each categories as category, index}
+          <div
+            class="flex-shrink-0 w-full md:w-auto p-2 snap-start"
+            in:fly={{ x: 100, duration: 300 }}
+            out:fly={{ x: -100, duration: 300 }}
+          >
+            <MiniLineChart
+              data={groupedByGovFunction[gov_function]}
+              xKey="year"
+              yKey={category}
+              height={150}
+            />
+            <h3 class="mt-2 text-md font-normal text-gray-700">
+              {category}
+            </h3>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/each}
 </div>
-{/each}
+
+<style>
+  /* Hide scrollbar for a cleaner look */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+</style>
