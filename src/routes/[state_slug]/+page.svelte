@@ -4,7 +4,7 @@
 
   export let data;
   
-  let categories = ['ft_employment', 'ft_pay']; // Data categories to show
+  let categories = ['ft_pay_per_ft_employee', 'ft_employment', 'ft_pay', 'pt_pay_per_pt_employee', 'pt_employment', 'pt_pay']; // Data categories to show
 
   const { stateData } = data;
 
@@ -57,11 +57,9 @@
       delete acceptedGroups[gov_function];
     }
   });
-
-  console.log('Accepted groups:', acceptedGroups);
 </script>
 
-<div class="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+<div class="min-h-screen bg-white p-1 sm:p-1 lg:p-8">
   <p class="mb-8 italic text-gray-700">
     This will be a note about the state if there is a note.
   </p>
@@ -78,14 +76,3 @@
     </div>
   {/each}
 </div>
-
-<style>
-  /* Hide scrollbar for a cleaner look */
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-</style>

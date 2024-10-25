@@ -1,13 +1,37 @@
 <script>
+  import { onMount } from 'svelte';
+  import { currentIndex } from '$lib/store.js';
   import Carousel from 'svelte-carousel';
   import MiniLineChart from '$lib/components/MiniLineChart.svelte';
-  import { currentIndex } from '$lib/store.js';
 
   export let data = {};
   export let categories = [];
+  export let colors = ["#4e79a7","#f28e2c","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"]
 
   let index;
   let carousel;
+  let particlesToShow = 1;
+  let particlesToScroll = 1;
+
+  const updateParticlesToShow = () => {
+    const width = window.innerWidth;
+    if (width >= 1600) {
+      particlesToShow = 6;
+      particlesToScroll = 6;
+    } else if (width >= 768) {
+      particlesToShow = 3;
+      particlesToScroll = 3;
+    } else {
+      particlesToShow = 1;
+      particlesToScroll = 1;
+    }
+  };
+
+  onMount(() => {
+    updateParticlesToShow();
+    window.addEventListener('resize', updateParticlesToShow);
+    return () => window.removeEventListener('resize', updateParticlesToShow);
+  });
 
   // Subscribe to currentIndex store
   currentIndex.subscribe(value => {
@@ -20,26 +44,32 @@
   // Update store whenever the Carousel's page changes
   function handlePageChange(event) {
     currentIndex.set(event.detail);
-    // No need to call carousel.goTo here
   }
 </script>
 
 <Carousel
   bind:this={carousel}
   on:pageChange={handlePageChange}
+  particlesToShow={particlesToShow}
+  particlesToScroll={particlesToScroll}
   infinite={false}
 >
   {#each categories as category, i}
-    <div class="flex-shrink-0 w-full md:w-auto p-2">
+    <div class="flex-shrink-0 w-full md:w-auto px-3">
+      {#if data.hasOwnProperty(category)}
       <MiniLineChart
         data={data[category]}
         xKey="year"
         yKey={category}
-        height={150}
+        height={120}
+        stroke={colors[i]}
       />
-      <h3 class="mt-2 text-md font-normal text-gray-700">
+      <h3 class="mt-2 text-sm text-center font-normal text-gray-700">
         {category}
       </h3>
+      {:else}
+        <p class="text-center">Missing data for <code>{category}</code>.</p>
+      {/if}
     </div>
   {/each}
 </Carousel>

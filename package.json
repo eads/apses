@@ -42,6 +42,7 @@
     "arquero": "^6.0.0",
     "layercake": "^8.3.4",
     "micro-dash": "^8.1.0",
+    "svelte-carousel": "github:vadimkorr/svelte-carousel#pull/142/head",
     "svelte-gestures": "^5.0.6",
     "svelte-scrolling": "^1.4.0",
     "svelte-select": "^5.8.3",
