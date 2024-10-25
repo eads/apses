@@ -1,20 +1,6 @@
 <script>
-  import MiniLineChart from '$lib/components/MiniLineChart.svelte';
-  import { groupBy, mapValues, reduce } from 'micro-dash';
-  import { swipe } from 'svelte-gestures';
-  import { currentVariableIndex, variables } from '$lib/store.js';
-  import { get } from 'svelte/store';
-  import { fly } from 'svelte/transition';
-
-  function handleSwipe(event) {
-    let index = get(currentVariableIndex);
-    if (event.direction === 'LEFT') {
-      index = (index + 1) % variables.length;
-    } else if (event.direction === 'RIGHT') {
-      index = (index - 1 + variables.length) % variables.length;
-    }
-    currentVariableIndex.set(index);
-  }
+  import { groupBy } from 'micro-dash';
+  import Slider from '$lib/components/Slider.svelte';
 
   export let data;
   
@@ -66,8 +52,13 @@
         });
       }
     });
+    // Prune empty categories for this gov_function
+    if (Object.keys(acceptedGroups[gov_function]).length === 0) {
+      delete acceptedGroups[gov_function];
+    }
   });
 
+  console.log('Accepted groups:', acceptedGroups);
 </script>
 
 <div class="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
@@ -75,35 +66,15 @@
     This will be a note about the state if there is a note.
   </p>
 
-  {#each Object.keys(groupedByGovFunction) as gov_function}
+  {#each Object.keys(acceptedGroups) as gov_function}
     <div class="category-row mb-12">
       <h2 class="text-xl font-medium uppercase mb-4 text-gray-800">
         {gov_function}
       </h2>
-
-      <!-- Container for Charts -->
-      <div
-        class="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory hide-scrollbar"
-        use:swipe={handleSwipe}
-      >
-        {#each categories as category, index}
-          <div
-            class="flex-shrink-0 w-full md:w-auto p-2 snap-start"
-            in:fly={{ x: 100, duration: 300 }}
-            out:fly={{ x: -100, duration: 300 }}
-          >
-            <MiniLineChart
-              data={groupedByGovFunction[gov_function]}
-              xKey="year"
-              yKey={category}
-              height={150}
-            />
-            <h3 class="mt-2 text-md font-normal text-gray-700">
-              {category}
-            </h3>
-          </div>
-        {/each}
-      </div>
+      <Slider
+        data={acceptedGroups[gov_function]}
+        categories={categories}
+      />
     </div>
   {/each}
 </div>

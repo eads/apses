@@ -1,6 +1,5 @@
 <script>
   import { scrollTo } from 'svelte-scrolling';
-  import { goto, invalidateAll } from '$app/navigation';
   export let stateNames = [];
   export let state_slug;
 
@@ -8,7 +7,7 @@
   function handleStateSelect(event) {
     const selectedState = event.target.value;
     if (selectedState) {
-      goto(`/${selectedState}`, { replaceState: false});
+      window.location.href = `/${selectedState}`;
     }
   }
 </script>
