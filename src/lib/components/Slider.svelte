@@ -6,20 +6,29 @@
   export let data = {};
   export let categories = [];
 
-  // Subscribe to currentIndex store
   let index;
+  let carousel;
+
+  // Subscribe to currentIndex store
   currentIndex.subscribe(value => {
     index = value;
+    if (carousel) {
+      carousel.goTo(index);
+    }
   });
 
-  // Update store whenever currentPageIndex changes
+  // Update store whenever the Carousel's page changes
   function handlePageChange(event) {
-    console.log('event', event.detail.currentPageIndex);
-    currentIndex.set(event.detail.currentPageIndex);
+    currentIndex.set(event.detail);
+    // No need to call carousel.goTo here
   }
 </script>
 
-<Carousel>
+<Carousel
+  bind:this={carousel}
+  on:pageChange={handlePageChange}
+  infinite={false}
+>
   {#each categories as category, i}
     <div class="flex-shrink-0 w-full md:w-auto p-2">
       <MiniLineChart
