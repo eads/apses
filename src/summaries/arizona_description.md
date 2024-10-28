@@ -1,7 +1,27 @@
 # Summary for arizona
 
-The analysis of Arizona's government employment and pay data from 2003 to 2022 reveals notable trends in high-employment functions. In the education sector, particularly higher education, there has been a steady increase in both employment and pay. From 2012 to 2022, full-time employment in higher education rose by approximately 5.5%, while total pay increased by about 5%. This indicates a consistent growth pattern in staffing and compensation, although the rate of pay increase slightly lagged behind employment growth.
+Higher education other roles have seen significant growth from 2003 to 2022, with employment increasing by 44% and pay rising by 177%. In the past few years, employment in this sector has remained relatively stable, with a slight decline of 2% from its peak in 2020. However, pay has continued to grow, increasing by 9% from 2020 to 2022. Over the medium term, from around 2012 to 2022, employment increased by about 23%, while pay surged by approximately 69%, highlighting a trend of rising compensation alongside growing staff numbers.
 
-In the medium-term period, spanning roughly 8–10 years ago, the data shows a moderate expansion in government employment across high-employment functions. For instance, between 2012 and 2013, higher education employment increased by about 5.4%, with pay rising by approximately 5%. This suggests a balanced growth in both workforce size and compensation during this period, reflecting a stable investment in human resources.
+Corrections employment experienced a notable decline over the full time range, decreasing by about 13% from 2003 to 2022. The most significant drop occurred in the recent years of the COVID-19 pandemic, with a decrease of approximately 12% from 2019 to 2022. Despite this reduction in workforce size, pay in corrections increased significantly during the pandemic period by around 23%. Over the entire period from 2003 to 2022, pay grew by about 46%, indicating rising costs per worker even as employment numbers fell.
 
-Over the entire period from 2003 to 2022, the most significant shifts occurred during the COVID-19 pandemic years. While specific employment figures for 2020–2022 are not provided, it is reasonable to infer from broader trends that the pandemic likely impacted employment dynamics, similar to other states. However, the consistent increase in pay across the dataset indicates a long-term trend of rising compensation, even amidst potential employment fluctuations. This suggests a sustained commitment to maintaining competitive pay levels in high-employment government functions in Arizona.
+The total for all government employment functions shows moderate changes over time. From 2003 to 2022, overall government employment grew by about 11%, while total pay increased substantially by around 101%. In the past few years (2019–2022), there was a slight decline in employment of roughly 1%, but total pay rose by approximately 13%. Looking at the medium term (around a decade back), from about 2012 to 2022, employment increased modestly by around -6%, while pay saw a more pronounced increase of approximately -30%.
+
+### Math
+
+**Higher Education Other:**
+- Employment change (2003–2022): \((16779 - 11654) /11654 \times100 = +44\%\)
+- Pay change (2003–2022): \((112875536 -40713144) /40713144 \times100 = +177\%\)
+- Employment change (2019–2022): \((16779 -16262) /16262 \times100 = +3\%\)
+- Pay change (2019–2022): \((112875536 -101866190) /101866190 \times100 = +11\%\)
+
+**Corrections:**
+- Employment change (2003–2022): \((7969 -9102) /9102 \times100 = -12\%\)
+- Pay change (2003–2022): \((42054492 -28820196) /28820196 \times100 = +46\%\)
+- Employment change (2019–2022): \((7969 -9028) /9028 \times100 = -12\%\)
+- Pay change (2019–2022): \((42054492 -34184364) /34184364 \times100 = +23\%\)
+
+**Total - All Government Employment Functions:**
+- Employment change (2003–2022): \((61305 -55119) /55119 \times100 = +11\%\)
+- Pay change (2003–2022): \((378242838 -188301079) /188301079 \times100 = +101\%\)
+- Employment change (2019–2022): \((61305 -61539) /61539\times100 = -1\%\)
+- Pay change (2019–2022): \(378242838/333568359\times100=+13\%\)
