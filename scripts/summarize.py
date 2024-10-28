@@ -15,9 +15,9 @@ def generate_content(gpt_assistant_prompt: str, gpt_user_prompt: str) -> dict:
     response = client.chat.completions.create(
         model="gpt-4o",  # Ensure correct model name is used
         messages=messages,
-        temperature=0.3,
-        max_tokens=4000,
-        frequency_penalty=0.2
+        temperature=0.4,
+        max_tokens=8000,
+        frequency_penalty=0.3
     )
     response_text = response.choices[0].message.content
     tokens_used = response.usage.total_tokens
@@ -34,13 +34,11 @@ def summarize(input_file, output_file):
 
     # Calculate total employment across years for each function, then filter for top 30%
     total_employment_df = df.groupby('gov_function', as_index=False)['ft_employment'].sum()
-    cutoff = total_employment_df['ft_employment'].quantile(0.7)
+    cutoff = total_employment_df['ft_employment'].quantile(0.6)
     top_functions = total_employment_df[total_employment_df['ft_employment'] >= cutoff]['gov_function']
 
     # Filter the original data for only high-employment functions
     top_data = df[df['gov_function'].isin(top_functions)]
-
-    import ipdb; ipdb.set_trace()
 
     # Prepare prompt content: Organize data by year for each high-employment government function
     data_prompt = ""
@@ -53,27 +51,31 @@ def summarize(input_file, output_file):
     # Construct the prompt
     assistant_prompt = "You are someone who explains data to a broad audience, summarizing government employment and pay data as a small blurb in a data visualization web app."
     user_prompt = f"""
-Analyze the following government employment and pay data for {state_code} from 2003 to 2022.
+Analyze the following government employment and pay data for {state_code} from 2003 to 2022. It's broken out by government "function" (e.g., corrections, health, higher education) and includes special "total - all government employment" and "education total" functions that aggregate across categories and all government functions.
 
-Focus on high-employment government functions only (those above the median full-time employment across all government functions). Summarize the most notable changes in employment and pay for these government functions, highlighting notable shifts over three time periods: the past few years (including the COVID-19 pandemic), the medium-term (around 8–10 years back), and the full time range from 2000 to 2022. Focus on quantifiable changes, such as percentage increases or decreases in employment and pay, without speculating on causes. Pick out two or three gov functions to analyze. You don't need introductory language like "In this analysis of [state]" because the context will be clear from the user interface where this is used.
+I've sent you a selection of high-employment functions. Summarize the most notable changes in employment and pay for these government functions, highlighting notable shifts over three time periods: the past few years (including the COVID-19 pandemic), the medium-term (around 8–10 years back), and the full time range from 2000 to 2022. Focus on quantifiable changes, such as percentage increases or decreases in employment and pay, without speculating on causes. Pick out three functions to analyze, plus the "total - all government employment" category. You don't need introductory language like "In this analysis of [state]" because the context will be clear from the user interface where this is used.
 
-Your response should be two paragraphs long and markdown-formatted.
+Round to whole numbers. In a section at the end, include your math.
 
-Example response for Florida:
+Your response should be three paragraphs long (four short paragraphs could be OK) and markdown-formatted.
 
-*The data reveals significant shifts in employment and pay across high-employment government functions over nearly two decades. In corrections, employment has seen a major reduction, with full-time positions dropping by about 25% from 2000 to 2022, with the steepest decline occurring during the pandemic years (2019–2022). In this recent period, corrections employment decreased by about 12.4%, while per-capita pay continued to rise, totaling an 8% increase in pay from 2019 to 2022. Overall, pay in corrections grew by approximately 20% over the entire dataset, showing a consistent trend of rising costs per worker even as employment fell.
+Make sure you use a logical ordering, starting with the functions with the most notable changes, not necessarily the order in the example. 
+
+Example response for Florida (the order should follow the most notable changes by function):
+
+*Over nearly two decades, corrections employment has seen a major reduction, with full-time positions dropping by about 25% from 2000 to 2022, with the steepest decline occurring during the pandemic years (2019–2022). In this recent period, corrections employment decreased by about 12%, while per-capita pay continued to rise, totaling an 8% increase in pay from 2019 to 2022. Overall, pay in corrections grew by approximately 20% over the entire dataset, showing a consistent trend of rising costs per worker even as employment fell.
 
 The health and higher education sectors experienced different dynamics. Health employment increased modestly by 15% since 2000, while pay rose by around 25%, indicating steady growth in both staff numbers and compensation. In higher education instructional roles, employment rose by about 10% from 2012 to 2020, but average pay increased more sharply, with a 15% rise over the same period. Other higher education roles saw even more pronounced growth, with employment expanding by around 30% and pay by 40% since 2000, reflecting a long-term upward trend in both staff size and compensation in the education sector.*
 
 Here's the data:
 {data_prompt}
 """
+    click.echo(f"PROMPT: {user_prompt}")
 
     # Generate summary with the OpenAI client
     response_data = generate_content(assistant_prompt, user_prompt)
     summary_text = response_data["response"]
 
-    click.echo(f"PROMPT: {user_prompt}")
     click.echo(f"SUMMARY: {summary_text}")
     click.echo(f"TOKENS USED: {response_data['tokens_used']}")
 

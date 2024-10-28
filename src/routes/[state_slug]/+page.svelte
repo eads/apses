@@ -3,10 +3,10 @@
   import Slider from '$lib/components/Slider.svelte';
 
   export let data;
-  
-  let categories = ['ft_employment', 'ft_pay', 'ft_pay_per_ft_employee', 'pt_employment', 'pt_pay', 'pt_pay_per_pt_employee']; // Data categories to show
+ 
+  let categories = ['ft_employment', 'ft_pay', 'ft_pay_per_ft_employee']; // Data categories to show
 
-  const { stateData, stateSlug, stateNames } = data;
+  const { stateData, stateSlug, stateNames, description } = data;
 
   const stateName = stateNames.find(state => state.slug === stateSlug).state;
 
@@ -65,10 +65,10 @@
   <h1 class="text-3xl font-bold text-gray-800 mb-4">
     {stateName}
   </h1>
-  
-  <p class="mb-8 italic text-gray-700">
-    This will be a note about the state of {stateName} if there is a note.
-  </p>
+ 
+  <div class="text-sm mb-6 [&_p]:mb-6">
+    {@html description}
+  </div>
 
   {#each Object.keys(acceptedGroups) as gov_function}
     <div class="category-row mb-12">
