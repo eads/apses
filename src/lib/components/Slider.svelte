@@ -53,14 +53,16 @@
   particlesToShow={particlesToShow}
   particlesToScroll={particlesToScroll}
   infinite={false}
+  duration={400}
 >
   {#each categories as category, i}
-    <div class="flex-shrink-0 w-full md:w-auto px-3">
+    <div class="flex-shrink-0 w-[90%] md:w-[75%] lg:w-[60%] p-2"> <!-- Wider chart container -->
       {#if data.hasOwnProperty(category)}
       <MiniLineChart
         data={data[category]}
         xKey="year"
         yKey={category}
+        xDomain={[2004, 2022]}
         height={120}
         stroke={colors[i]}
       />
@@ -73,3 +75,12 @@
     </div>
   {/each}
 </Carousel>
+
+<style>
+/* Adjust paddle sizes */
+.carousel__paddle {
+  width: 24px; /* Smaller width */
+  height: 24px; /* Smaller height */
+  background-color: rgba(0, 0, 0, 0.3); /* Customize paddle color */
+}
+</style>

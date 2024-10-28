@@ -8,6 +8,7 @@
   export let yKey = 'myY';
   export let height = 100;
   export let stroke = '#ab00d6';
+  export let xDomain = [0, null]
 </script>
 
 <style>
@@ -27,6 +28,7 @@
     padding={{ top: 20, right: 40, bottom: 30, left: 40 }}
     x={xKey}
     y={yKey}
+    xDomain={xDomain}
     yDomain={[0, null]}
     {data}
   >

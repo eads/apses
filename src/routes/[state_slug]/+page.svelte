@@ -4,9 +4,11 @@
 
   export let data;
   
-  let categories = ['ft_pay_per_ft_employee', 'ft_employment', 'ft_pay', 'pt_pay_per_pt_employee', 'pt_employment', 'pt_pay']; // Data categories to show
+  let categories = ['ft_employment', 'ft_pay', 'ft_pay_per_ft_employee', 'pt_employment', 'pt_pay', 'pt_pay_per_pt_employee']; // Data categories to show
 
-  const { stateData } = data;
+  const { stateData, stateSlug, stateNames } = data;
+
+  const stateName = stateNames.find(state => state.slug === stateSlug).state;
 
   const processedData = stateData.map(item => {
     const newItem = { ...item };
@@ -60,8 +62,12 @@
 </script>
 
 <div class="min-h-screen bg-white p-1 sm:p-1 lg:p-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-4">
+    {stateName}
+  </h1>
+  
   <p class="mb-8 italic text-gray-700">
-    This will be a note about the state if there is a note.
+    This will be a note about the state of {stateName} if there is a note.
   </p>
 
   {#each Object.keys(acceptedGroups) as gov_function}

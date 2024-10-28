@@ -2,7 +2,7 @@ export async function load({ params, fetch }) {
   const { state_slug } = params;
 
   // Fetch the state-specific data
-  const response = await fetch(`/files/${state_slug}.json`);
+  const response = await fetch(`/files/${state_slug}_data.json`);
   const rawData = await response.json();
   const stateData = rawData
     .filter(d => d.year > 2003)
@@ -13,6 +13,7 @@ export async function load({ params, fetch }) {
       })
     );
   return {
-    stateData
+    stateData,
+    stateSlug: state_slug
   };
 }
