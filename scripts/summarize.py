@@ -15,9 +15,9 @@ def generate_content(gpt_assistant_prompt: str, gpt_user_prompt: str) -> dict:
     response = client.chat.completions.create(
         model="gpt-4o",  # Ensure correct model name is used
         messages=messages,
-        temperature=0.4,
-        max_tokens=8000,
-        frequency_penalty=0.3
+        temperature=0.3,
+        max_tokens=16000,
+        frequency_penalty=0.2
     )
     response_text = response.choices[0].message.content
     tokens_used = response.usage.total_tokens
@@ -29,7 +29,7 @@ def generate_content(gpt_assistant_prompt: str, gpt_user_prompt: str) -> dict:
 @click.option('--output-file', type=click.Path(), required=True, help='Path to save the markdown summary file.')
 def summarize(input_file, output_file):
     click.echo(f"Summarizing data from {input_file}")
-    state_code = input_file.split('/')[-1].split('_')[0]
+    state_code = input_file.split('/')[-1].replace('_', ' ')
     df = pd.read_json(input_file)
 
     # Calculate total employment across years for each function, then filter for top 30%
@@ -44,7 +44,7 @@ def summarize(input_file, output_file):
     data_prompt = ""
     for function in top_functions:
         function_data = top_data[top_data['gov_function'] == function]
-        function_data_lines = [f"{row['year']}: Employment: {row['ft_employment']}, Pay: {row['ft_pay']}"
+        function_data_lines = [f"{row['year']}: State employment: {row['ft_employment']}, State pay: {row['ft_pay']}\nNational median employment: {row['national_median_employment']}, National median pay: {row['national_median_pay']}, National median pay per employee: {row['national_median_pay_per_employee']}"
                                for _, row in function_data.iterrows()]
         data_prompt += f"\n\n{function}:\n" + "\n".join(function_data_lines)
 
@@ -53,22 +53,35 @@ def summarize(input_file, output_file):
     user_prompt = f"""
 Analyze the following government employment and pay data for {state_code} from 2003 to 2022. It's broken out by government "function" (e.g., corrections, health, higher education) and includes special "total - all government employment" and "education total" functions that aggregate across categories and all government functions.
 
-I've sent you a selection of high-employment functions. Summarize the most notable changes in employment and pay for these government functions, highlighting notable shifts over three time periods: the past few years (including the COVID-19 pandemic), the medium-term (around 8–10 years back), and the full time range from 2000 to 2022. Focus on quantifiable changes, such as percentage increases or decreases in employment and pay, without speculating on causes. Pick out three functions to analyze, plus the "total - all government employment" category. You don't need introductory language like "In this analysis of [state]" because the context will be clear from the user interface where this is used.
-
-Round to whole numbers. In a section at the end, include your math.
-
-Your response should be three paragraphs long (four short paragraphs could be OK) and markdown-formatted.
-
-Make sure you use a logical ordering, starting with the functions with the most notable changes, not necessarily the order in the example. 
-
-Example response for Florida (the order should follow the most notable changes by function):
-
-*Over nearly two decades, corrections employment has seen a major reduction, with full-time positions dropping by about 25% from 2000 to 2022, with the steepest decline occurring during the pandemic years (2019–2022). In this recent period, corrections employment decreased by about 12%, while per-capita pay continued to rise, totaling an 8% increase in pay from 2019 to 2022. Overall, pay in corrections grew by approximately 20% over the entire dataset, showing a consistent trend of rising costs per worker even as employment fell.
-
-The health and higher education sectors experienced different dynamics. Health employment increased modestly by 15% since 2000, while pay rose by around 25%, indicating steady growth in both staff numbers and compensation. In higher education instructional roles, employment rose by about 10% from 2012 to 2020, but average pay increased more sharply, with a 15% rise over the same period. Other higher education roles saw even more pronounced growth, with employment expanding by around 30% and pay by 40% since 2000, reflecting a long-term upward trend in both staff size and compensation in the education sector.*
-
 Here's the data:
 {data_prompt}
+
+You'll write three bullets for each government function that summarizes it (called $$summary$$ below), focusing on employment and pay trends over time, and how they compare to national medians. You'll also give mind to where this category ranks in the state. Then you'll spit out a little html snippet that can be embedded in a web app that includes a svelte component visualizing the data and your summary.
+
+The bullet list of points should go in the $$summary$$ section of the output, you don't need _any_ frontmatter or summary beforehand. Just these rows of data.
+
+Do not alter the function names or the order of the data.
+
+Then write a series of html snippets that can be embedded in a web app to display the data and your summary like this. I've marked where the summary should go with $$summary$$ and where the government function should go with $$gov_function$$:
+
+<h2>$$gov_function$$</h2>
+<div class="flex flex-col md:flex-row gap-12">
+  <div class="text-sm mb-6 md:mb-0 xl:w-2/6 [&_p]:mb-6">
+    <ul> $$summary$$ </ul>
+  </div>
+
+  <div class="flex-1">
+      <div class="category-row mb-12">
+        <h2 class="text-xl font-medium uppercase mb-4 text-gray-800">
+          $$gov_function$$
+        </h2>
+        <Slider
+          data={{acceptedGroups["$$gov_function$$"]}}
+          categories={{categories}}
+        />
+      </div>
+  </div>
+</div>
 """
     click.echo(f"PROMPT: {user_prompt}")
 
