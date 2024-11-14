@@ -2,100 +2,150 @@ import json
 import click
 import openai
 import os
-import pandas as pd
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Initialize the OpenAI client
+RANKING_THRESHOLD = 10  # Number of top government functions to include article details
+MAX_RETRIES = 5         # Maximum number of retries for rate-limiting errors
+
+# Initialize OpenAI client
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_content(gpt_assistant_prompt: str, gpt_user_prompt: str) -> dict:
-    messages = [
-        {"role": "assistant", "content": gpt_assistant_prompt},
-        {"role": "user", "content": gpt_user_prompt}
+# Static assistant prompt
+ASSISTANT_PROMPT = (
+    "You are someone who explains data to a savvy but broad audience, summarizing government "
+    "employment and pay data for a data visualization web app. Your tone is informative but friendly and creative."
+)
+
+# User prompt templates
+PROMPT_WITH_ARTICLE = """
+Analyze the government employment and pay data for the "{gov_function}" function in {state_code} from 2003 to 2022.
+
+Here is the data:
+{state_data}
+
+Write a three-sentence summary focusing on employment and pay trends over time, major leaps or dips, and how the category compares to national averages for pay per employee. Include a html formatted link to a good article from a trustworthy source about the topic. For example:
+
+"Employment in New Shrampshure's corrections rose steadily from 20XX to 20YY, with state pay increasing XX percent during the same period. Pay per employee in corrections was roughly <fraction> the national average in 2022. This is counter to the <a href=\"https://www.themarshallproject.org/2024/01/10/prison-correctional-officer-shortage-overtime-data\">national trend</a> of falling correctional employment."
+
+Mix up the sentence order to offer some variation. Please return nothing but the sentences in Markdown format.
+"""
+
+PROMPT_NO_ARTICLE = """
+Analyze the government employment and pay data for the "{gov_function}" function in {state_code} from 2003 to 2022.
+
+Here is the data:
+{state_data}
+
+Write a two-sentence summary focusing on employment and pay trends over time, major leaps or dips, and how the category compares to national averages for pay per employee. Please return nothing but the sentences in plaintext.
+
+Here's an example:
+
+"Employment in Cauliflowernia's hospital sector was flat from 2019 to 2022, yet the overall budget increased rapidly. The big jump in pay per employee in this period mirrors the national trend."
+"""
+
+def generate_content_with_retries(gpt_assistant_prompt: str, gpt_user_prompt: str) -> dict:
+    """Send a prompt to OpenAI with retry logic for rate-limiting errors."""
+    retries = 0
+    while retries < MAX_RETRIES:
+        try:
+            messages = [
+                {"role": "assistant", "content": gpt_assistant_prompt},
+                {"role": "user", "content": gpt_user_prompt},
+            ]
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0.7,
+                top_p=0.5,
+                max_tokens=1500,
+                frequency_penalty=0.1,
+            )
+            response_text = response.choices[0].message.content
+            tokens_used = response.usage.total_tokens
+            return {"response": response_text, "tokens_used": tokens_used}
+        except openai.RateLimitError as e:
+            wait_time = 5 ** retries
+            click.echo(f"Rate limit exceeded. Retrying in {wait_time}s...")
+            time.sleep(wait_time)
+            retries += 1
+        except openai.OpenAIError as e:
+            raise Exception(f"OpenAI API error: {e}")
+    raise Exception(f"Failed to generate content after {MAX_RETRIES} retries due to rate limiting.")
+
+def process_government_function(index, gov_function, item, state_code):
+    """Prepare the prompt and send it to OpenAI."""
+    state_data_lines = [
+        f"{row['year']}: State employment: {int(row['ft_employment'])}, State pay: {int(row['ft_pay'])}"
+        f" | National avg employment: {int(row['national_avg_employment'])}, National avg pay per employee: {int(row['national_avg_pay_per_employee'])}"
+        for row in item["timeseries"]
     ]
-    response = client.chat.completions.create(
-        model="gpt-4o",  # Ensure correct model name is used
-        messages=messages,
-        temperature=0.3,
-        max_tokens=16000,
-        frequency_penalty=0.2
-    )
-    response_text = response.choices[0].message.content
-    tokens_used = response.usage.total_tokens
-    
-    return {"response": response_text, "tokens_used": tokens_used}
+    state_data = "\n".join(state_data_lines)
+
+    # Choose appropriate prompt template
+    if index == 0 or index > RANKING_THRESHOLD:  # Exclude "all government sectors" and anything outside top 5
+        user_prompt = PROMPT_NO_ARTICLE.format(gov_function=gov_function, state_code=state_code, state_data=state_data)
+    else:
+        user_prompt = PROMPT_WITH_ARTICLE.format(gov_function=gov_function, state_code=state_code, state_data=state_data)
+
+    try:
+        response_data = generate_content_with_retries(ASSISTANT_PROMPT, user_prompt)
+        return {
+            "index": index,  # Preserve the original order
+            "gov_function": gov_function,
+            "summary": response_data["response"],
+        }
+    except Exception as e:
+        return {
+            "index": index,
+            "gov_function": gov_function,
+            "summary": f"Error generating summary: {str(e)}",
+        }
 
 @click.command()
-@click.option('--input-file', type=click.Path(exists=True), required=True, help='Path to the state JSON data file.')
-@click.option('--output-file', type=click.Path(), required=True, help='Path to save the markdown summary file.')
+@click.option(
+    "--input-file",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to the state JSON data file.",
+)
+@click.option(
+    "--output-file",
+    type=click.Path(),
+    required=True,
+    help="Path to save the consolidated JSON file.",
+)
 def summarize(input_file, output_file):
     click.echo(f"Summarizing data from {input_file}")
-    state_code = input_file.split('/')[-1].replace('_', ' ')
-    df = pd.read_json(input_file)
+    state_code = input_file.split("/")[-1].replace("_", " ").replace("data.json", "").title()
 
-    # Calculate total employment across years for each function, then filter for top 30%
-    total_employment_df = df.groupby('gov_function', as_index=False)['ft_employment'].sum()
-    cutoff = total_employment_df['ft_employment'].quantile(0.6)
-    top_functions = total_employment_df[total_employment_df['ft_employment'] >= cutoff]['gov_function']
+    with open(input_file, "r") as file:
+        data = json.load(file)
 
-    # Filter the original data for only high-employment functions
-    top_data = df[df['gov_function'].isin(top_functions)]
+    # Process data in parallel
+    results = []
+    with ThreadPoolExecutor() as executor:
+        future_to_function = {
+            executor.submit(process_government_function, index, gov_function, item, state_code): index
+            for index, (gov_function, item) in enumerate(data.items())
+        }
 
-    # Prepare prompt content: Organize data by year for each high-employment government function
-    data_prompt = ""
-    for function in top_functions:
-        function_data = top_data[top_data['gov_function'] == function]
-        function_data_lines = [f"{row['year']}: State employment: {row['ft_employment']}, State pay: {row['ft_pay']}\nNational median employment: {row['national_median_employment']}, National median pay: {row['national_median_pay']}, National median pay per employee: {row['national_median_pay_per_employee']}"
-                               for _, row in function_data.iterrows()]
-        data_prompt += f"\n\n{function}:\n" + "\n".join(function_data_lines)
+        for future in as_completed(future_to_function):
+            result = future.result()
+            results.append(result)
+            click.echo(f"Processed {result['gov_function']}")
 
-    # Construct the prompt
-    assistant_prompt = "You are someone who explains data to a broad audience, summarizing government employment and pay data as a small blurb in a data visualization web app."
-    user_prompt = f"""
-Analyze the following government employment and pay data for {state_code} from 2003 to 2022. It's broken out by government "function" (e.g., corrections, health, higher education) and includes special "total - all government employment" and "education total" functions that aggregate across categories and all government functions.
+    # Reconstitute original rank order
+    results.sort(key=lambda x: x["index"])
+    for result in results:
+        result.pop("index")  # Remove the index key for cleaner output
 
-Here's the data:
-{data_prompt}
+    # Write consolidated JSON output
+    with open(output_file, "w") as outfile:
+        json.dump(results, outfile, indent=2)
 
-You'll write three bullets for each government function that summarizes it (called $$summary$$ below), focusing on employment and pay trends over time, and how they compare to national medians. You'll also give mind to where this category ranks in the state. Then you'll spit out a little html snippet that can be embedded in a web app that includes a svelte component visualizing the data and your summary.
+    click.echo(f"Consolidated summaries saved to {output_file}")
 
-The bullet list of points should go in the $$summary$$ section of the output, you don't need _any_ frontmatter or summary beforehand. Just these rows of data.
 
-Do not alter the function names or the order of the data.
-
-Then write a series of html snippets that can be embedded in a web app to display the data and your summary like this. I've marked where the summary should go with $$summary$$ and where the government function should go with $$gov_function$$:
-
-<h2>$$gov_function$$</h2>
-<div class="flex flex-col md:flex-row gap-12">
-  <div class="text-sm mb-6 md:mb-0 xl:w-2/6 [&_p]:mb-6">
-    <ul> $$summary$$ </ul>
-  </div>
-
-  <div class="flex-1">
-      <div class="category-row mb-12">
-        <h2 class="text-xl font-medium uppercase mb-4 text-gray-800">
-          $$gov_function$$
-        </h2>
-        <Slider
-          data={{acceptedGroups["$$gov_function$$"]}}
-          categories={{categories}}
-        />
-      </div>
-  </div>
-</div>
-"""
-    click.echo(f"PROMPT: {user_prompt}")
-
-    # Generate summary with the OpenAI client
-    response_data = generate_content(assistant_prompt, user_prompt)
-    summary_text = response_data["response"]
-
-    click.echo(f"SUMMARY: {summary_text}")
-    click.echo(f"TOKENS USED: {response_data['tokens_used']}")
-
-    # Write the summary to a markdown file
-    with open(output_file, 'w') as md_file:
-        click.echo(f"Saving summary to {output_file}")
-        md_file.write(f"# Summary for {state_code}\n\n{summary_text}")
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     summarize()
