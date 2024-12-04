@@ -1,84 +1,70 @@
 <script>
-  import { groupBy } from 'micro-dash';
   import Slider from '$lib/components/Slider.svelte';
 
   export let data;
  
-  let categories = ['ft_employment', 'ft_pay', 'ft_pay_per_ft_employee']; // Data categories to show
+  let categories = [
+    ['ft_employment', 'national_avg_employment'],
+    ['ft_pay_per_ft_employee', 'national_avg_pay_per_employee'],
+    ['ft_pay', 'national_avg_pay'],
+  ]; // Data categories to show
 
-  const { stateData, stateSlug, stateNames, description } = data;
-
+  const { stateData, stateSlug, stateNames, summaries } = data;
   const stateName = stateNames.find(state => state.slug === stateSlug).state;
 
-  const processedData = stateData.map(item => {
-    const newItem = { ...item };
-    categories.forEach(category => {
-      if (newItem[category] === null || newItem[category] === undefined) {
-        newItem[category] = 0;
-      }
-    });
-    return newItem;
-  });
+  console.log(data);
 
-  const threshold = 50; // Set your threshold here
-
-  // Step 1: Group data by 'gov_function'
-  const groupedByGovFunction = groupBy(processedData, item => item.gov_function);
-
-  // Initialize the acceptedGroups object
-  const acceptedGroups = {};
-  const rejectedSubGroups = []; // Array to store rejected sub-groups
-
-  // Step 2: Process each 'gov_function' group
-  Object.entries(groupedByGovFunction).forEach(([gov_function, items]) => {
-    acceptedGroups[gov_function] = {}; // Initialize object for this gov_function
-
-    // Process each category within this gov_function
-    categories.forEach(category => {
-      // Filter items where the category value is not zero
-      const categoryItems = items.filter(item => item[category] !== 0);
-
-      // Calculate the total sum of the category over all items
-      const totalSum = categoryItems.reduce((sum, item) => sum + item[category], 0);
-
-      if (totalSum >= threshold) {
-        // Include this sub-group in acceptedGroups
-        acceptedGroups[gov_function][category] = categoryItems;
-      } else {
-        // Collect rejected sub-groups
-        rejectedSubGroups.push({
-          gov_function,
-          category,
-          items: categoryItems,
-          totalSum,
-        });
-      }
-    });
-    // Prune empty categories for this gov_function
-    if (Object.keys(acceptedGroups[gov_function]).length === 0) {
-      delete acceptedGroups[gov_function];
-    }
-  });
+  const nonSummaries = Object.entries(stateData).slice(9);
 </script>
 
-<div class="min-h-screen bg-white p-1 sm:p-1 lg:p-8">
+<div class="min-h-screen bg-white p-1 sm:p-1 lg:px-4 lg:py-6">
+ 
   <h1 class="text-3xl font-bold text-gray-800 mb-4">
     {stateName}
   </h1>
- 
-  <div class="text-sm mb-6 [&_p]:mb-6">
-    {@html description}
-  </div>
 
-  {#each Object.keys(acceptedGroups) as gov_function}
-    <div class="category-row mb-12">
-      <h2 class="text-xl font-medium uppercase mb-4 text-gray-800">
-        {gov_function}
-      </h2>
+  {#each summaries as row, idx}
+  <div class="flex flex-col md:flex-row gap-4 lg:gap-12 mb-12">
+    <div class="flex-1">
+      <h1 class="text-md font-bold">{row.gov_function}</h1>
       <Slider
-        data={acceptedGroups[gov_function]}
+        data={stateData[row.gov_function].timeseries}
+        categories={categories}
+      />
+      {#if idx === 0}
+        <div class="sm:hidden flex justify-center items-center text-zinc-500 text-xs font-semibold px-3 py-1 rounded-full mx-auto w-fit my-2">
+          <span>← SWIPE TO SEE OTHER VARIABLES →</span>
+        </div>
+      {/if}
+    </div>
+    <div class="md:mb-0 md:mt-8 xl:w-2/6">
+      <p class="text-sm [&>a]:text-blue [&>a]:underline">
+        {@html row.summary}
+      </p>
+    </div>
+  </div>
+  {/each}
+  {#each nonSummaries as [gov_function, row]}
+  <div class="flex flex-col md:flex-row gap-4 lg:gap-12 mb-12">
+    <div class="flex-1">
+      <h1 class="text-md font-bold">{gov_function}</h1>
+      <Slider
+        data={row.timeseries}
         categories={categories}
       />
     </div>
+    <div class="md:mb-0 md:mt-10 lg:w-2/6">
+      <p class="text-center text-xs md:text-sm">
+        ——
+      </p>
+    </div>
+  </div>
   {/each}
 </div>
+
+<style>
+  a {
+    color: #3182ce !important;
+    text-decoration: underline;
+  }
+</style>

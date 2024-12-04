@@ -8,5 +8,8 @@ export default defineConfig({
 	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
-	}
+	},
+  define: {
+    'import.meta.env.BUILD_TIME': JSON.stringify(new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }))
+  }
 });

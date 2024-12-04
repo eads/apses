@@ -12,18 +12,26 @@
   let carousel;
   let particlesToShow = 1;
   let particlesToScroll = 1;
+  let showArrows = false;
+  let showDots = true;
 
   const updateParticlesToShow = () => {
     const width = window.innerWidth;
     if (width >= 1600) {
       particlesToShow = 6;
       particlesToScroll = 6;
+      showDots = false;
+      showArrows = false;
     } else if (width >= 768) {
       particlesToShow = 3;
       particlesToScroll = 3;
+      showDots = false;
+      showArrows = false;
     } else {
       particlesToShow = 1;
       particlesToScroll = 1;
+      showDots = true;
+      showArrows = false;
     }
   };
 
@@ -50,28 +58,24 @@
 <Carousel
   bind:this={carousel}
   on:pageChange={handlePageChange}
+  arrows={showArrows}
+  dots={showDots}
   particlesToShow={particlesToShow}
   particlesToScroll={particlesToScroll}
   infinite={false}
   duration={400}
 >
-  {#each categories as category, i}
+  {#each categories as [category, nationalCategory], i}
     <div class="flex-shrink-0 w-[90%] md:w-[75%] lg:w-[60%] p-2"> <!-- Wider chart container -->
-      {#if data.hasOwnProperty(category)}
       <MiniLineChart
-        data={data[category]}
-        xKey="year"
-        yKey={category}
-        xDomain={[2004, 2022]}
-        height={120}
-        stroke={colors[i]}
+        data={data}
+        categories={[category, nationalCategory]} 
+        height={190}
+        seriesColors={[colors[i], "#999999"]}
       />
-      <h3 class="mt-2 text-sm text-center font-normal text-gray-700">
+      <h3 class="text-xs text-center font-normal text-gray-700">
         {category}
       </h3>
-      {:else}
-        <p class="text-center">Missing data for <code>{category}</code>.</p>
-      {/if}
     </div>
   {/each}
 </Carousel>

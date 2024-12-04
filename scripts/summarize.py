@@ -4,9 +4,11 @@ import openai
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from googlesearch import search  # For fetching topical articles
 
 RANKING_THRESHOLD = 10  # Number of top government functions to include article details
 MAX_RETRIES = 5         # Maximum number of retries for rate-limiting errors
+ARTICLE_RESULTS = 2     # Number of articles to fetch per query
 
 # Initialize OpenAI client
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -24,11 +26,7 @@ Analyze the government employment and pay data for the "{gov_function}" function
 Here is the data:
 {state_data}
 
-Write a three-sentence summary focusing on employment and pay trends over time, major leaps or dips, and how the category compares to national averages for pay per employee. Include a html formatted link to a good article from a trustworthy source about the topic. For example:
-
-"Employment in New Shrampshure's corrections rose steadily from 20XX to 20YY, with state pay increasing XX percent during the same period. Pay per employee in corrections was roughly <fraction> the national average in 2022. This is counter to the <a href=\"https://www.themarshallproject.org/2024/01/10/prison-correctional-officer-shortage-overtime-data\">national trend</a> of falling correctional employment."
-
-Mix up the sentence order to offer some variation. Please return nothing but the sentences in Markdown format.
+Write a three-sentence summary focusing on employment and pay trends over time, major leaps or dips, and how the category compares to national averages for pay per employee. Please include real-world context. Return nothing but the sentences in plaintext.
 """
 
 PROMPT_NO_ARTICLE = """
@@ -37,12 +35,16 @@ Analyze the government employment and pay data for the "{gov_function}" function
 Here is the data:
 {state_data}
 
-Write a two-sentence summary focusing on employment and pay trends over time, major leaps or dips, and how the category compares to national averages for pay per employee. Please return nothing but the sentences in plaintext.
-
-Here's an example:
-
-"Employment in Cauliflowernia's hospital sector was flat from 2019 to 2022, yet the overall budget increased rapidly. The big jump in pay per employee in this period mirrors the national trend."
+Write a two-sentence summary focusing on employment and pay trends over time, major leaps or dips, and how the category compares to national averages for pay per employee. Return nothing but the sentences in plaintext.
 """
+
+def fetch_reliable_articles(query, num_results=ARTICLE_RESULTS):
+    """Fetch topical articles using Google Search."""
+    try:
+        return [url for url in search(query, num_results=num_results)]
+    except Exception as e:
+        click.echo(f"Error fetching articles: {e}")
+        return []
 
 def generate_content_with_retries(gpt_assistant_prompt: str, gpt_user_prompt: str) -> dict:
     """Send a prompt to OpenAI with retry logic for rate-limiting errors."""
@@ -74,7 +76,7 @@ def generate_content_with_retries(gpt_assistant_prompt: str, gpt_user_prompt: st
     raise Exception(f"Failed to generate content after {MAX_RETRIES} retries due to rate limiting.")
 
 def process_government_function(index, gov_function, item, state_code):
-    """Prepare the prompt and send it to OpenAI."""
+    """Prepare the prompt, send it to OpenAI, and fetch articles."""
     state_data_lines = [
         f"{row['year']}: State employment: {int(row['ft_employment'])}, State pay: {int(row['ft_pay'])}"
         f" | National avg employment: {int(row['national_avg_employment'])}, National avg pay per employee: {int(row['national_avg_pay_per_employee'])}"
@@ -83,17 +85,29 @@ def process_government_function(index, gov_function, item, state_code):
     state_data = "\n".join(state_data_lines)
 
     # Choose appropriate prompt template
-    if index == 0 or index > RANKING_THRESHOLD:  # Exclude "all government sectors" and anything outside top 5
+    if index == 0 or index > RANKING_THRESHOLD:
         user_prompt = PROMPT_NO_ARTICLE.format(gov_function=gov_function, state_code=state_code, state_data=state_data)
     else:
         user_prompt = PROMPT_WITH_ARTICLE.format(gov_function=gov_function, state_code=state_code, state_data=state_data)
 
     try:
+        # Generate summary
         response_data = generate_content_with_retries(ASSISTANT_PROMPT, user_prompt)
+        summary = response_data["response"]
+
+        # Fetch articles for top government functions
+        articles = []
+        if index > 0 and index <= RANKING_THRESHOLD:
+            query = f"{gov_function} government employment trends {state_code}"
+            articles = fetch_reliable_articles(query)
+
+        if articles:
+            summary += "\n\nTopical articles:\n" + "\n".join(articles)
+
         return {
             "index": index,  # Preserve the original order
             "gov_function": gov_function,
-            "summary": response_data["response"],
+            "summary": summary,
         }
     except Exception as e:
         return {
