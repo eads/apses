@@ -1,6 +1,6 @@
-DATA_FILE = static/files/state_employment.json
-DATA_OUTPUT_DIR = static/files
-SUMMARY_OUTPUT_DIR = src/summaries
+DATA_FILE = static/files/data/state_employment.json
+DATA_OUTPUT_DIR = static/files/data
+SUMMARY_OUTPUT_DIR = static/files/summaries
 PROCESS_SCRIPT = scripts/process_data.py
 SUMMARY_SCRIPT = scripts/summarize.py
 PYTHON = pipenv run  # Default to pipenv run, can be overridden
@@ -15,7 +15,7 @@ summarize: process_data
 	mkdir -p $(SUMMARY_OUTPUT_DIR)
 	for file in $(DATA_OUTPUT_DIR)/*_data.json; do \
 		state=$$(basename $$file _data.json); \
-		$(PYTHON) python $(SUMMARY_SCRIPT) --input-file=$$file --output-file=$(SUMMARY_OUTPUT_DIR)/$$state\_description.md; \
+		$(PYTHON) python $(SUMMARY_SCRIPT) --input-file=$$file --output-file=$(SUMMARY_OUTPUT_DIR)/$$state\_summary.json; \
 	done
 
 # Run both steps by default
