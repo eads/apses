@@ -9,6 +9,7 @@ click = "*"
 pandas = "*"
 googlesearch-python = "*"
 requests = "*"
+simplejson = "*"
 
 [dev-packages]
 ipdb = "*"

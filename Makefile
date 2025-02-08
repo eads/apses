@@ -1,3 +1,4 @@
+DATA_URL = https://tmp-gfx-public-data.s3.amazonaws.com/aspep/aspep_with_extended_derived_stats.json
 DATA_FILE = static/files/data/state_employment.json
 DATA_OUTPUT_DIR = static/files/data
 SUMMARY_OUTPUT_DIR = static/files/summaries
@@ -5,9 +6,14 @@ PROCESS_SCRIPT = scripts/process_data.py
 SUMMARY_SCRIPT = scripts/summarize.py
 PYTHON = pipenv run  # Default to pipenv run, can be overridden
 
+
+# Step 0: Download data
+download_data:
+	curl $(DATA_URL) -o $(DATA_FILE) --compressed
+
+
 # Step 1: Process data and generate state-specific JSON files
 process_data:
-	mkdir -p $(DATA_OUTPUT_DIR)
 	$(PYTHON) python $(PROCESS_SCRIPT) --input-file=$(DATA_FILE) --output-dir=$(DATA_OUTPUT_DIR)
 
 # Step 2: Generate markdown summaries from the newly created JSON files
