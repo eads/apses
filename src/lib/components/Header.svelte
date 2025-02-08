@@ -21,7 +21,7 @@
   </div>
   <select class="text-sm w-3/5 max-w-96 p-1 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-md hover:border-blue-500 focus:outline-none focus:border-blue-500 transition ease-in-out" on:change="{handleStateSelect}">
     {#each stateNames as state}
-      <option value="{state.slug}" selected={state.slug === state_slug}>{state.state}</option>
+      <option value="{state.postalCode.toLowerCase()}" selected={state.postalCode.toLowerCase() === state_slug}>{state.state}</option>
     {/each}
   </select>
 </header>

@@ -18,7 +18,7 @@
   <Header {stateNames} {state_slug} />
 
   <section class="flex-grow overflow-y-scroll p-4">
-    <p><b>Warning:</b> This page is a work in progress. AI-generated copy may be inaccurate and more recent data is available. Please check back soon for updates.</p>
+    <p><b>Warning:</b> This page is a work in progress. AI-generated copy may be inaccurate.</p>
     <slot></slot> <!-- Default slot for main content -->
   </section>
 </div>

@@ -9,12 +9,14 @@
     ['ft_pay', 'national_avg_pay'],
   ]; // Data categories to show
 
-  const { stateData, stateSlug, stateNames, summaries } = data;
-  const stateName = stateNames.find(state => state.slug === stateSlug).state;
-
   console.log(data);
 
-  const nonSummaries = Object.entries(stateData).slice(9);
+  // const { stateData, stateSlug, stateNames, summaries } = data;
+  // const stateName = stateNames.find(state => state.postalCode === stateSlug).state;
+
+  // console.log(data);
+
+  // const nonSummaries = Object.entries(stateData).slice(9);
 </script>
 
 <div class="min-h-screen bg-white p-1 sm:p-1 lg:px-4 lg:py-6">
