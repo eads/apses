@@ -4,19 +4,22 @@
   export let data;
  
   let categories = [
-    ['ft_employment', 'national_avg_employment'],
-    ['ft_pay_per_ft_employee', 'national_avg_pay_per_employee'],
-    ['ft_pay', 'national_avg_pay'],
+    ['ft_eq_employment', 'national_ft_eq_employment'],
+    // ['ft_eq_employment_1yr_abs', 'national_ft_eq_employment_1yr_abs'],
+    // ['ft_eq_employment_5yr_abs', 'national_ft_eq_employment_5yr_abs'],
+    ['pay_per_fte', 'national_pay_per_fte'],
+    // ['pay_per_fte_1yr_pct', 'national_pay_per_fte_1yr_pct'],
+    // ['pay_per_fte_5yr_pct', 'national_pay_per_fte_5yr_pct'],
+    ['total_pay', 'national_total_pay'],
   ]; // Data categories to show
 
-  console.log(data);
 
-  // const { stateData, stateSlug, stateNames, summaries } = data;
-  // const stateName = stateNames.find(state => state.postalCode === stateSlug).state;
+  const { stateData, stateSlug, stateNames } = data;
+  const stateName = stateNames.find(state => state.postalCode.toLowerCase() === stateSlug).state;
 
-  // console.log(data);
-
-  // const nonSummaries = Object.entries(stateData).slice(9);
+  const govFunctions = Object.entries(stateData) //.filter(d => d[1] && d[1].timeseries && d[1].timeseries.length > 0);
+  console.log(govFunctions);
+  // const govFunctions = [];
 </script>
 
 <div class="min-h-screen bg-white p-1 sm:p-1 lg:px-4 lg:py-6">
@@ -25,12 +28,12 @@
     {stateName}
   </h1>
 
-  {#each summaries as row, idx}
+  {#each govFunctions as [gov_function, row], idx}
   <div class="flex flex-col md:flex-row gap-4 lg:gap-12 mb-12">
     <div class="flex-1">
-      <h1 class="text-md font-bold">{row.gov_function}</h1>
+      <h1 class="text-md font-bold">{gov_function}</h1>
       <Slider
-        data={stateData[row.gov_function].timeseries}
+        data={row.timeseries}
         categories={categories}
       />
       {#if idx === 0}
@@ -40,25 +43,11 @@
       {/if}
     </div>
     <div class="md:mb-0 md:mt-8 xl:w-2/6">
-      <p class="text-sm [&>a]:text-blue [&>a]:underline">
-        {@html row.summary}
-      </p>
-    </div>
-  </div>
-  {/each}
-  {#each nonSummaries as [gov_function, row]}
-  <div class="flex flex-col md:flex-row gap-4 lg:gap-12 mb-12">
-    <div class="flex-1">
-      <h1 class="text-md font-bold">{gov_function}</h1>
-      <Slider
-        data={row.timeseries}
-        categories={categories}
-      />
-    </div>
-    <div class="md:mb-0 md:mt-10 lg:w-2/6">
-      <p class="text-center text-xs md:text-sm">
-        ——
-      </p>
+      {#if row.summary}
+        <p class="text-sm [&>a]:text-blue [&>a]:underline">{@html row.summary}</p>
+      {:else}
+        <p class="text-sm [&>a]:text-blue [&>a]:underline">No summary generated.</p>
+      {/if}
     </div>
   </div>
   {/each}

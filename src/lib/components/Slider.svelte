@@ -71,7 +71,6 @@
         data={data}
         categories={[category, nationalCategory]} 
         height={190}
-        seriesColors={[colors[i], "#999999"]}
       />
       <h3 class="text-xs text-center font-normal text-gray-700">
         {category}

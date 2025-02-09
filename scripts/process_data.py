@@ -48,8 +48,19 @@ def process_data(input_file, output_dir):
             on=['year', 'gov_function'],
             how='left'
         )
+
+        # Identify the most recent year
+        most_recent_year = merged_data['year'].max()
+
+        # Calculate total ft_eq_employment for the most recent year per gov_function
+        recent_data = merged_data[merged_data['year'] == most_recent_year]
+        employment_by_function = recent_data.groupby('gov_function')['ft_eq_employment'].sum().sort_values(ascending=False)
         
-        for gov_function, function_data in merged_data.groupby('gov_function'):
+        # Sort gov_function by ft_eq_employment
+        sorted_gov_functions = employment_by_function.index.tolist()
+
+        for gov_function in sorted_gov_functions:
+            function_data = merged_data[merged_data['gov_function'] == gov_function]
             cleaned_data = function_data[[
                 'year', 
                 'ft_eq_employment', 

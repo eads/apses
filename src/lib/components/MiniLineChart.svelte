@@ -2,7 +2,6 @@
   import { LayerCake, Svg, Html, groupLonger, flatten } from 'layercake';
 
   import { scaleOrdinal } from 'd3-scale';
-  import { timeParse, timeFormat } from 'd3-time-format';
   import { format } from 'd3-format';
 
   import Line from '$lib/components/Line.svelte';
@@ -10,7 +9,7 @@
   import AxisY from '$lib/components/AxisY.svelte';
 
   export let data = undefined;
-  export let categories = ['ft_employment', 'national_median_employment'];
+  export let categories = ['ft_employment', 'national_ft_employment'];
   export let seriesColors = ['#ffe4b8', '#aaaaaa'];
   export let height = 150;
 
@@ -33,7 +32,7 @@
     x={xKey}
     y={yKey}
     z={zKey}
-    yDomain={[0, null]}
+    yDomain={[-100, null]}
     zScale={scaleOrdinal()}
     zRange={seriesColors}
     flatData={flatten(groupedData, 'values')}
@@ -43,7 +42,7 @@
       <AxisX
         format={formatLabelX} 
         gridlines={false}
-        ticks={[2004, 2013, 2022]}
+        ticks={[2003, 2013, 2023]}
       />
       <AxisY 
         format={formatLabelY} 
@@ -65,44 +64,3 @@
     width: 100%;
   }
 </style>
-
-<!-- <script>
-  import { LayerCake, Svg } from 'layercake';
-
-  import Line from '$lib/components/Line.svelte';
-
-  export let data = undefined;
-  export let xKey = 'myX';
-  export let yKey = 'myY';
-  export let height = 100;
-  export let stroke = '#ab00d6';
-  export let xDomain = [0, null];
-  export let textPrefix = "";
-</script>
-
-<style>
-  /*
-    The wrapper div needs to have an explicit width and height in CSS.
-    It can also be a flexbox child or CSS grid element.
-    The point being it needs dimensions since the <LayerCake> element will
-    expand to fill it.
-  */
-  .chart-container {
-    width: 100%;
-  }
-</style>
-
-<div class="chart-container" style="height: {height}px;">
-  <LayerCake
-    padding={{ top: 20, right: 60, bottom: 30, left: 60 }}
-    x={xKey}
-    y={yKey}
-    xDomain={xDomain}
-    yDomain={[0, null]}
-    {data}
-  >
-    <Svg>
-      <Line {stroke} {textPrefix}/>
-    </Svg>
-  </LayerCake>
-</div> -->
