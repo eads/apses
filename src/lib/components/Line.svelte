@@ -12,12 +12,11 @@
   export let curve = curveLinear;
 
   $: path = line().x($xGet).y($yGet).curve(curve);
-  // .defined($y)
 </script>
 
 <g class="line-group">
   {#each $data as group, i}
-    <path class="path-line path-line-{i}" d={path(group.values)} stroke={$zGet(group)}></path>
+    <path class="path-line path-line-{group.category}" d={path(group.values)}></path>
   {/each}
 </g>
 
@@ -27,8 +26,10 @@
     stroke-linejoin: round;
     stroke-linecap: round;
     stroke-width: 4px;
+    stroke: #ff6600;
   }
-	.path-line-1 {
+	path[class*="path-line-national"] {
 		stroke-width: 2px;
+    stroke: #aaaaaa;
 	}
 </style>

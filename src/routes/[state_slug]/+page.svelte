@@ -5,21 +5,21 @@
  
   let categories = [
     ['ft_eq_employment', 'national_ft_eq_employment'],
-    // ['ft_eq_employment_1yr_abs', 'national_ft_eq_employment_1yr_abs'],
-    // ['ft_eq_employment_5yr_abs', 'national_ft_eq_employment_5yr_abs'],
-    ['pay_per_fte', 'national_pay_per_fte'],
+    ['ft_eq_employment_5yr_abs', 'national_ft_eq_employment_5yr_abs'],
+    // ['ft_eq_employment_1yr_pct', 'national_ft_eq_employment_1yr_pct'],
+    // ['ft_eq_employment_5yr_pct', 'national_ft_eq_employment_5yr_pct'],
+    // ['pay_per_fte', 'national_pay_per_fte'],
     // ['pay_per_fte_1yr_pct', 'national_pay_per_fte_1yr_pct'],
     // ['pay_per_fte_5yr_pct', 'national_pay_per_fte_5yr_pct'],
-    ['total_pay', 'national_total_pay'],
+    // ['total_pay', 'national_total_pay'],
   ]; // Data categories to show
 
 
   const { stateData, stateSlug, stateNames } = data;
   const stateName = stateNames.find(state => state.postalCode.toLowerCase() === stateSlug).state;
 
-  const govFunctions = Object.entries(stateData) //.filter(d => d[1] && d[1].timeseries && d[1].timeseries.length > 0);
-  console.log(govFunctions);
-  // const govFunctions = [];
+  const govFunctions = Object.entries(stateData).slice(4);
+
 </script>
 
 <div class="min-h-screen bg-white p-1 sm:p-1 lg:px-4 lg:py-6">

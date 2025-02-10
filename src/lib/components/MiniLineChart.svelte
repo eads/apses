@@ -1,5 +1,5 @@
 <script>
-  import { LayerCake, Svg, Html, groupLonger, flatten } from 'layercake';
+  import { LayerCake, Svg, groupLonger, flatten } from 'layercake';
 
   import { scaleOrdinal } from 'd3-scale';
   import { format } from 'd3-format';
@@ -10,7 +10,6 @@
 
   export let data = undefined;
   export let categories = ['ft_employment', 'national_ft_employment'];
-  export let seriesColors = ['#ffe4b8', '#aaaaaa'];
   export let height = 150;
 
   const xKey = 'year';
@@ -24,6 +23,15 @@
     groupTo: zKey,
     valueTo: yKey
   });
+
+  // Define styles as objects to ensure consistent application
+  const seriesStyles = categories.reduce((acc, cat) => {
+    acc[cat] = {
+      color: cat.startsWith('national_') ? '#aaaaaa' : '#ff6600',
+      strokeWidth: cat.startsWith('national_') ? 1 : 3
+    };
+    return acc;
+  }, {});
 </script>
 
 <div class="chart-container" style="height: {height}px;">
@@ -32,9 +40,9 @@
     x={xKey}
     y={yKey}
     z={zKey}
-    yDomain={[-100, null]}
+    yDomain={[0, null]}
     zScale={scaleOrdinal()}
-    zRange={seriesColors}
+    zRange={categories.map(cat => seriesStyles[cat].color)}
     flatData={flatten(groupedData, 'values')}
     data={groupedData}
   >
@@ -54,12 +62,6 @@
 </div>
 
 <style>
-  /*
-    The wrapper div needs to have an explicit width and height in CSS.
-    It can also be a flexbox child or CSS grid element.
-    The point being it needs dimensions since the <LayerCake> element will
-    expand to fill it.
-  */
   .chart-container {
     width: 100%;
   }
