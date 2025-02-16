@@ -6,6 +6,8 @@
 
   export let data = {};
   export let categories = [];
+  
+  export let colors = [];
 
   let index;
   let carousel;
@@ -52,6 +54,8 @@
   function handlePageChange(event) {
     currentIndex.set(event.detail);
   }
+  
+  const buttonLabels = ['Emp.', 'Pay/FTE', 'Tot. Pay'];
 </script>
 
 <Carousel
@@ -65,17 +69,39 @@
   duration={400}
 >
   {#each categories as [category, nationalCategory], i}
-    <div class="flex-shrink-0 w-[90%] md:w-[75%] lg:w-[60%] md:pr-3 lg:pr-10 mt-4 mb-8"> <!-- Wider chart container -->
+    <div class="flex-shrink-0 w-[90%] md:w-[75%] lg:w-[60%] md:pr-3 lg:pr-20 mt-4 mb-2"> <!-- Wider chart container -->
+      <h3 class="text-xs font-normal text-gray-700">
+        {category}
+      </h3>
       <MiniLineChart
         data={data}
         categories={[category, nationalCategory]} 
-        height={250}
+        height={200}
+        lineColor={colors[i]}
       />
-      <h3 class="text-xs text-center font-normal text-gray-700">
-        {category}
-      </h3>
     </div>
   {/each}
+
+  <div slot="dots" class="custom-dots my-2">
+    {#each categories as _, pageIndex (pageIndex)}
+    <button
+      class={`
+        px-2 py-1 rounded-full text-sm font-medium mx-1 
+        transition-all duration-200 focus:outline-none 
+        focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+        ${$currentIndex === pageIndex 
+          ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700' 
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+        }
+      `}
+      class:selected={$currentIndex === pageIndex}
+      on:click={() => carousel.goTo(pageIndex)}
+    >
+      {buttonLabels[pageIndex]}
+    </button> 
+    {/each}
+  </div>
+
 </Carousel>
 
 <style>

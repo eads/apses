@@ -24,18 +24,24 @@
 
 <!-- About Section -->
 <div bind:this={aboutSection} use:scrollRef={'about'} class="h-dvh bg-white z-10">
-  <header class="bg-gradient-to-r from-pink-800 to-purple-900 p-3 shadow-lg">
-    <h1 class="text-white text-right">
-      <a class="underline text-white" use:scrollTo={'app'}>Back to data</a> 
+  <header class="bg-white border-b border-slate-200 py-4 px-2">
+    <h1 class="text-right">
+      <a  
+        class="ml-auto text-sm text-slate-600 hover:text-slate-900 transition-colors"
+        use:scrollTo={'app'}>Back to data</a> 
     </h1>
   </header>
   <section class="flex-grow overflow-y-scroll p-4">
-    <div class="max-w-prose mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl mb-4">About the State Employment Explorer</h1>
+    <div class="max-w-prose mx-auto px-4 sm:px-6 lg:px-8 [&_a]:text-blue-600">
+      <h1 class="text-3xl mb-4">About the ASPEP State Employment Explorer</h1>
       <p class="mb-8 italic">By David Eads / First created July 30, 2024; last updated {buildTime}.</p>
-      <p class="mb-4">These charts show the <a href="https://www.census.gov/programs-surveys/apes.html">Annual Survey of Public Employment & Payroll</a>, <a href="https://observablehq.com/@themarshallproject/census-labor-data-release">aggregated by state and government sector</a>, 2003-2023, based on the <a href="https://www.themarshallproject.org/2024/07/25/how-to-investigate-the-trend-of-declining-prison-staff-and-deteriorating-conditions-behind-bars">toolkit released by The Marshall Project</a>.</p>
+      <p class="mb-4">This data product visualizes the <a href="https://www.census.gov/programs-surveys/apes.html">Annual Survey of Public Employment & Payroll</a>, at the state level, broken down by <a href="https://observablehq.com/@themarshallproject/census-labor-data-release">government sector</a>, from 2003-2023, based on the <a href="https://www.themarshallproject.org/2024/07/25/how-to-investigate-the-trend-of-declining-prison-staff-and-deteriorating-conditions-behind-bars">toolkit released by The Marshall Project</a>.</p>
       <p class="mb-4">The code for this site is available on <a href="https://github.com/eads/apses/">Github</a>.</p>
-      <p></p>
+      <p>
+
+      <a  
+        use:scrollTo={'app'}><b>Go back to the data.</b></a> 
+      </p>
     </div>
   </section>
 </div>

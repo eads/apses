@@ -9,10 +9,12 @@
   export let data = [];  // Default to empty array instead of undefined
   export let categories = ['ft_employment', 'national_ft_employment'];
   export let height = 150;
+  export let lineColor = "#4e79a7";
 
   const xKey = 'year';
   const yKey = 'value';
   const zKey = 'category';
+
   
   // Validate data before processing
   $: validData = Array.isArray(data) ? data.filter(d => 
@@ -34,8 +36,6 @@
     formatLabelY = d => d !== null && d !== undefined ? format(`~s`)(d) : '';
   }
 
-  // POtential pallette
-  export let colors = ["#4e79a7","#f28e2c","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"]
   
   $: groupedData = validData.length > 0 ? groupLonger(validData, categories, {
     groupTo: zKey,
@@ -45,7 +45,7 @@
   // Define styles as objects to ensure consistent application
   const seriesStyles = categories.reduce((acc, cat) => {
     acc[cat] = {
-      color: cat.startsWith('national_') ? '#888888' : '#ff6600',
+      color: cat.startsWith('national_') ? '#888888' : lineColor,
       strokeWidth: cat.startsWith('national_') ? 1.8 : 3
     };
     return acc;
@@ -71,7 +71,7 @@
 <div class="chart-container" style="height: {height}px;">
   {#if validData.length > 0}
     <LayerCake
-      padding={{ top: 20, right: 10, bottom: 20, left: 32 }}
+      padding={{ top: 12, right: 20, bottom: 10, left: 32 }}
       x={xKey}
       y={yKey}
       z={zKey}
@@ -86,7 +86,7 @@
         <AxisX
           format={formatLabelX} 
           gridlines={false}
-          ticks={5}
+          ticks={[2009, 2011, 2013, 2015, 2017, 2019, 2021, 2023]} 
         />
         <AxisY 
           format={formatLabelY} 
