@@ -6,7 +6,6 @@
 
   export let data = {};
   export let categories = [];
-  export let colors = ["#4e79a7","#f28e2c","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"]
 
   let index;
   let carousel;
@@ -18,8 +17,8 @@
   const updateParticlesToShow = () => {
     const width = window.innerWidth;
     if (width >= 1600) {
-      particlesToShow = 6;
-      particlesToScroll = 6;
+      particlesToShow = 3;
+      particlesToScroll = 3;
       showDots = false;
       showArrows = false;
     } else if (width >= 768) {
@@ -66,11 +65,11 @@
   duration={400}
 >
   {#each categories as [category, nationalCategory], i}
-    <div class="flex-shrink-0 w-[90%] md:w-[75%] lg:w-[60%] p-2"> <!-- Wider chart container -->
+    <div class="flex-shrink-0 w-[90%] md:w-[75%] lg:w-[60%] md:pr-3 lg:pr-10 mt-4 mb-8"> <!-- Wider chart container -->
       <MiniLineChart
         data={data}
         categories={[category, nationalCategory]} 
-        height={190}
+        height={250}
       />
       <h3 class="text-xs text-center font-normal text-gray-700">
         {category}

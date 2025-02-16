@@ -1,17 +1,14 @@
 <script>
   import Slider from '$lib/components/Slider.svelte';
-
+  import SummaryStats from '$lib/components/SummaryStats.svelte';
+  import { currentIndex } from '$lib/store.js';
+  
   export let data;
  
   let categories = [
     ['ft_eq_employment', 'national_ft_eq_employment'],
-    ['ft_eq_employment_5yr_abs', 'national_ft_eq_employment_5yr_abs'],
-    // ['ft_eq_employment_1yr_pct', 'national_ft_eq_employment_1yr_pct'],
-    // ['ft_eq_employment_5yr_pct', 'national_ft_eq_employment_5yr_pct'],
-    // ['pay_per_fte', 'national_pay_per_fte'],
-    // ['pay_per_fte_1yr_pct', 'national_pay_per_fte_1yr_pct'],
-    // ['pay_per_fte_5yr_pct', 'national_pay_per_fte_5yr_pct'],
-    // ['total_pay', 'national_total_pay'],
+    ['pay_per_fte', 'national_pay_per_fte'],
+    ['total_pay', 'national_total_pay'],
   ]; // Data categories to show
 
 
@@ -24,7 +21,7 @@
 
 <div class="min-h-screen bg-white p-1 sm:p-1 lg:px-4 lg:py-6">
  
-  <h1 class="text-3xl font-bold text-gray-800 mb-4">
+  <h1 class="text-3xl font-bold text-gray-800 mb-8">
     {stateName}
   </h1>
 
@@ -38,16 +35,13 @@
       />
       {#if idx === 0}
         <div class="sm:hidden flex justify-center items-center text-zinc-500 text-xs font-semibold px-3 py-1 rounded-full mx-auto w-fit my-2">
-          <span>← SWIPE TO SEE OTHER VARIABLES →</span>
+          <span>← SWIPE TO SEE OTHER CHARTS →</span>
         </div>
       {/if}
-    </div>
-    <div class="md:mb-0 md:mt-8 xl:w-2/6">
-      {#if row.summary}
-        <p class="text-sm [&>a]:text-blue [&>a]:underline">{@html row.summary}</p>
-      {:else}
-        <p class="text-sm [&>a]:text-blue [&>a]:underline">No summary generated.</p>
-      {/if}
+      <SummaryStats 
+        data={row.timeseries}
+        categories={categories}
+      />
     </div>
   </div>
   {/each}
