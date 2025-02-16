@@ -25,3 +25,4 @@ vite.config.ts.timestamp-*
 
 # Sveltekit
 /static/files
+/src-data

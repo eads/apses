@@ -41,6 +41,7 @@
   "dependencies": {
     "arquero": "^6.0.0",
     "layercake": "^8.3.4",
+    "lucide-svelte": "^0.475.0",
     "micro-dash": "^8.1.0",
     "rehype-stringify": "^10.0.1",
     "remark": "^15.0.1",
